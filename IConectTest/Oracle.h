@@ -1,5 +1,4 @@
 #pragma once
-#include <cstddef>
 
 namespace ICTest
 {
@@ -19,7 +18,7 @@ namespace ICTest
 		/// Constructor. Opens a connection to the Oracle database (where the table ‘testing’ is located).
 		/// </summary>
 		/// <param name="errorProc">The procedure to run in case of an error during construction or connection. Optional.</param>
-		COracle(ICONECT_ERRORPROC errorProc = NULL);
+		COracle(ICONECT_ERRORPROC errorProc = nullptr);
 
 		/// <summary>
 		/// Destructor. Frees handles, destroys any loaded data from a query including the statement, resets all markers, and disconnects from Oracle.
@@ -37,14 +36,14 @@ namespace ICTest
 		/// Returns the value of the field specified by <paramref name="nField"/>.
 		/// Note: This function allocates the memory for the value returned by this function.
 		/// </summary>
-		/// <param name="nField">The index of the field to retrieve.</param>
+		/// <param name="nField">The index of the field to retrieve. The first field has index 0.</param>
 		/// <returns></returns>
 		char* GetFieldValue(int nField);
 
 		/// <summary>
 		/// Returns the name of the field specified by <paramref name="nField"/>.
 		/// </summary>
-		/// <param name="nField">The index of the field to retrieve.</param>
+		/// <param name="nField">The index of the field to retrieve. The first field has index 0.</param>
 		/// <returns></returns>
 		char* GetFieldName(int nField);
 
