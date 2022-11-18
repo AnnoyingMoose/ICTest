@@ -7,20 +7,84 @@
 using namespace std;
 using namespace ICTest;
 
+/// <summary>
+/// Procedure to call in case connecting to the Oracle database fails.
+/// </summary>
+/// <param name="message">The failure message.</param>
+void ErrorProc(const char* message)
+{
+    cerr << "Failed to connect to the Oracle database. Message from COracle follows:" << endl
+         << message << endl;
+
+    exit(1);
+}
+
+/// <summary>
+/// Constructs a string consisting of all the field names, comma-separated,
+/// for the specified database connection's current query.<br/>
+/// The string is allocated dynamically using the default allocator (<see langword="new"/>).
+/// The caller is responsible for deallocating the returned string.
+/// </summary>
+/// <param name="db">Object representing the relevant database connection.</param>
+/// <returns>A string representation of the query's field names, comma-separated.</returns>
+char* GetHeader(COracle* db)
+{
+    // TODO
+    return nullptr;
+}
+
+/// <summary>
+/// Constructs a string consisting of all the field values, comma-separated, for the
+/// specified database connection's current record, and advances to the next record.<br/>
+/// The string is allocated dynamically using the default allocator (<see langword="new"/>).
+/// The caller is responsible for deallocating the returned string.
+/// </summary>
+/// <param name="db">Object representing the relevant database connection.</param>
+/// <returns>A string representation of the values in the record, comma-separated.</returns>
+char* GetRecordAndAdvance(COracle* db)
+{
+    // TODO
+    return nullptr;
+}
+
 int main()
 {
-    COracle* db = new COracle();
+#define IC_QUERY_TEMPLATE(s) "SELECT " s " FROM testing WHERE AUTHOR = 'iconect\\london' OR OBJECT_ID >= 5"
+    const char* QUERY_COUNT = IC_QUERY_TEMPLATE("COUNT(*)");
+    const char* QUERY_DATA = IC_QUERY_TEMPLATE("OBJECT_ID, AUTHOR, TITLE");
+#undef IC_QUERY_TEMPLATE
+
+    COracle* db = new COracle(ErrorProc);
+
+    // Get the size of the result set first:
+    db->Open(QUERY_COUNT);
+    char* fieldBuffer = db->GetFieldValue(0);
+    int numRecords = atoi(fieldBuffer);
+    delete[] fieldBuffer;
+
+    // Allocate the outer layer of the buffer:
+    char** resultsBuffer = new char* [numRecords + 1];
+
+    db->Open(QUERY_DATA);
+
+    // The first element of the array is the header:
+    resultsBuffer[0] = GetHeader(db);
+
+    for (int i = 1; i <= numRecords; i++)
+        resultsBuffer[i] = GetRecordAndAdvance(db);
+
+    for (int i = 0; i < numRecords; i++)
+        cout << resultsBuffer[i] << endl;
+
+    // Do something with the data here, maybe?
+
+    // Clean up everything:
+
+    for (int i = 0; i < numRecords; i++)
+        delete[] resultsBuffer[i];
+
+    delete[] resultsBuffer;
+    delete db;
 
     return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
